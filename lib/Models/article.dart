@@ -32,14 +32,4 @@ class Article {
       _ => throw const FormatException('Failed to load article.'),
     };
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['title'] = title;
-    data['description'] = description;
-    data['date'] = date;
-    data['author'] = author;
-    data['urlPath'] = urlPath;
-    return data;
-  }
 }

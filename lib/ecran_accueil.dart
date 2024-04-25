@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:vlr/Models/match.dart';
 import 'package:vlr/api.dart';
-import 'Models/Article.dart';
+import 'Models/article.dart';
 import 'tiroir_nav.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
@@ -13,14 +14,16 @@ class EcranAccueil extends StatefulWidget {
 }
 
 class _EcranAccueilState extends State<EcranAccueil> {
-    Future<List<Article>> futureArticles = fetchNews();
-    List<Article> articles = [];
-    var test = [];
+  Future<List<Article>> futureArticles = fetchNews();
+  Future<List<Match>> futureMatches = fetchMatches();
+  List<Article> articles = [];
+  List<Match> matches = [];
+
 
   @override
   void initState() {
+    toListAsync();
     super.initState();
-    articlesList();
   }
 
   @override
@@ -38,23 +41,34 @@ class _EcranAccueilState extends State<EcranAccueil> {
               height: 50.0,
               autoPlay: true,
             ),
-            items: [1,2,3,4,5].map((i) {
+            items: matches.map((i) {
               return Builder(
                 builder: (BuildContext context) {
                   return Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
                       decoration: const BoxDecoration(
                           color: Colors.amber,
                       ),
-                      child: Text('text $i', style: TextStyle(fontSize: 16.0)),
                     alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Text('${i.team1} vs ${i.team2}', style: const TextStyle(fontSize: 16.0)),
+                          Row(
+                            children: [
+                              Text(i.score1, style: const TextStyle(fontSize: 16.0)),
+                              const Text(' - ', style: TextStyle(fontSize: 16.0)),
+                              Text(i.score2, style: const TextStyle(fontSize: 16.0)),
+                            ],
+                          ),
+                        ],
+                      ),
                   );
                 },
               );
             }).toList(),
           ),
-          Title(color: Colors.red, child: Text('Articles', style: TextStyle(fontSize: 20.0)),),
+          Title(color: Colors.red, child: const Text('Articles', style: TextStyle(fontSize: 20.0)),),
           Expanded(child:
             ListView.builder(
               scrollDirection: Axis.vertical,
@@ -66,12 +80,12 @@ class _EcranAccueilState extends State<EcranAccueil> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.newspaper),
+                        leading: const Icon(Icons.newspaper),
                         title: Text(
-                            '${articles[index].title}'
+                            articles[index].title
                         ),
                         subtitle: Text(
-                          '${articles[index].description}',
+                          articles[index].description,
                           style: TextStyle(color: Colors.black.withOpacity(0.6)),
                         ),
                       )
@@ -85,7 +99,9 @@ class _EcranAccueilState extends State<EcranAccueil> {
       ),
     );
   }
-  Future<void> articlesList() async {
+
+  Future<void> toListAsync() async {
+    matches = await futureMatches;
     articles = await futureArticles;
   }
 }
