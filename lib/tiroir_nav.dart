@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ecran_accueil.dart';
+import 'home_screen.dart';
 import 'ecran_a.dart';
-import 'ecran_b.dart';
+import 'article_screen.dart';
 
 class LeTiroir extends StatefulWidget {
   const LeTiroir({super.key});
@@ -17,6 +17,7 @@ class LeTiroirState extends State<LeTiroir> {
       padding: EdgeInsets.zero,
       children: <Widget>[
         Container(
+          color: const Color(0xFF2f3337),
           height: 200,
         ),
         ListTile(
@@ -29,7 +30,7 @@ class LeTiroirState extends State<LeTiroir> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const EcranAccueil(),
+                builder: (context) => const HomeScreen(),
               ),
             );
             // Then close the drawer
@@ -53,29 +54,12 @@ class LeTiroirState extends State<LeTiroir> {
             // Then close the drawer
           },
         ),
-        ListTile(
-          dense: true,
-          leading: const Icon(Icons.ac_unit),
-          title: const Text("Ecran B"),
-          onTap: () {
-            Navigator.of(context).pop();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const EcranB(
-                  leParametre: '12ef56',
-                ),
-              ),
-            );
-            // Then close the drawer
-          },
-        ),
       ],
     );
 
     return Drawer(
       child: Container(
-        color: const Color(0xFFFFFFFF),
+        color: const Color(0xFF2f3337),
         child: listView,
       ),
     );

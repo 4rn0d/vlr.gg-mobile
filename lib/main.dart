@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'ecran_a.dart';
-import 'ecran_accueil.dart';
+import 'article_screen.dart';
+import 'home_screen.dart';
 
 
 void main() {
@@ -13,10 +13,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const EcranAccueil(),
+      home: const HomeScreen(),
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: const Color(0xFF2f3337),
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Color(0xFFd4d4d4)),
+          bodyMedium: TextStyle(color: Color(0xFFd4d4d4)),
+          bodySmall: TextStyle(color: Color(0xFFd4d4d4)),
+        ),
       ),
       routes: routes(),
     );
@@ -24,8 +29,7 @@ class MyApp extends StatelessWidget {
 
   Map<String, WidgetBuilder> routes() {
     return {
-      '/ecrana': (context) => const EcranA(),
-      '/accueil': (context) => const EcranAccueil(),
+      '/home': (context) => const HomeScreen(),
     };
   }
 }
