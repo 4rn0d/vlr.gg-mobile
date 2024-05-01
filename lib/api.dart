@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'Models/article.dart';
 import 'dart:async';
 
-Future<List<Article>> fetchNews() async
+fetchNews() async
 {
   final response = await http.get(Uri.parse('https://vlrggapi.vercel.app/news'));
   List<String> test = response.body.split('[')[1].split(']')[0].split('{');
@@ -29,7 +29,7 @@ Future<List<Article>> fetchNews() async
   }
 }
 
-Future<List> fetchCompletedMatches() async
+fetchCompletedMatches() async
 {
   final response = await http.get(Uri.parse('https://vlrggapi.vercel.app/match?q=results'));
   List<String> test = response.body.split('[')[1].split(']')[0].split('{');
@@ -63,18 +63,13 @@ Future<List> fetchCompletedMatches() async
   }
 }
 
-Future<String> fetchArticles(var articleId) async
+fetchArticles(var articleId, var text) async
 {
   final response = await http.get(Uri.parse('http://0.0.0.0:3001/article/$articleId'));
-  List<String> test = response.body.split('[')[1].split(']')[0].split('{');
-  var matches = [];
+  String test = response.body.split('[')[1].split(']')[0].split('{')[1];
   if (response.statusCode == 200) {
-    for (var i = 1; i < test.length - 35; i++) {
-      var asdasd = test[i];
-      var asd = asdasd.split('"text":"');
-      var text = asd[1].split('"text":"')[1].split('"}')[0];
-      matches = text as List;
-    }
+    var asd = test.split('"text":"');
+    text = asd[1].split('"}')[0];
   }
-  return matches.toString();
+  return text;
 }

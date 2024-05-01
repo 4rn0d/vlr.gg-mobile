@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:vlr/api.dart';
 
 import 'tiroir_nav.dart';
@@ -18,12 +16,12 @@ class ArticleScreen extends StatefulWidget {
 }
 
 class _ArticleScreenState extends State<ArticleScreen> {
+  late String articleText;
 
   @override
   void initState() {
-    fetchArticles(widget.articleId).then((value) {
-      super.initState();
-    });
+    fetchArticles(widget.articleId, articleText);
+    super.initState();
   }
 
   @override
@@ -32,9 +30,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
       drawer: const LeTiroir(),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2f3337),
-        title: const Text('Ecran B', style: TextStyle(color: Color(0xFFd4d4d4)),)
+        title: const Text('Article', style: TextStyle(color: Color(0xFFd4d4d4)),)
       ),
-      body: Text('Tu as navigué vers B ave'),
+      body: Text(articleText),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // TODO quand on pop, on revient à l'écran précédent

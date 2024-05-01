@@ -22,9 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    toListAsync().then((value) {
-      super.initState();
-    });
+    super.initState();
+    toListAsync();
   }
 
   @override
