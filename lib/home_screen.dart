@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:vlr/api.dart';
+import 'package:vlr/service.dart';
 import 'package:vlr/article_screen.dart';
 import 'Models/article.dart';
 import 'tiroir_nav.dart';
@@ -16,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  List<Article> articles = [];
+  var articles = [];
   var matches = [];
 
 
@@ -58,55 +59,102 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Row(
                             children: [
-                              const Column(
+                              const Padding(padding: EdgeInsets.only(left: 10.0)),
+                              Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  Icon(Icons.emoji_flags),
-                                  Icon(Icons.emoji_flags),
+                                  Text(countryToFlag(i['flag1']), style: const TextStyle(fontSize: 16.0)),
+                                  Text(countryToFlag(i['flag2']), style: const TextStyle(fontSize: 16.0)),
                                 ],
                               ),
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
                                   SizedBox(
-                                    width: 200.0,
+                                    width: 210.0,
                                     child: Text(i["team1"], style: const TextStyle(fontSize: 14.0),),
                                   ),
                                   SizedBox(
-                                    width: 200.0,
+                                    width: 210.0,
                                     child: Text(i["team2"], style: const TextStyle(fontSize: 14.0)),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                  i["score1"],
-                                  style: const TextStyle(
-                                      fontSize: 14.0,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Color(0xFFd4d4d4)
-                                  )
-                              ),
-                              Text(
-                                  i["score2"],
-                                  style: const TextStyle(
-                                      fontSize: 14.0,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Color(0xFFd4d4d4)
-                                  )
-                              ),
-                            ],
-                          ),
+                          if (i['category'] == 0)
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                    i["score1"],
+                                    style: const TextStyle(
+                                        fontSize: 14.0,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Color(0xFFd4d4d4)
+                                    )
+                                ),
+                                Text(
+                                    i["score2"],
+                                    style: const TextStyle(
+                                        fontSize: 14.0,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Color(0xFFd4d4d4)
+                                    )
+                                ),
+                              ],
+                            ),
+                          if (i['category'] == 1)
+                            const Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                    '-',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                    )
+                                ),
+                                Text(
+                                    '-',
+                                    style: TextStyle(
+                                        fontSize: 14.0,
+                                    )
+                                ),
+                              ],
+                            ),
+                          if (i['category'] == 2)
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                    i["score1"],
+                                    style: const TextStyle(
+                                        fontSize: 14.0,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Color(0xFFd4d4d4)
+                                    )
+                                ),
+                                Text(
+                                    i["score2"],
+                                    style: const TextStyle(
+                                        fontSize: 14.0,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Color(0xFFd4d4d4)
+                                    )
+                                ),
+                              ],
+                            ),
                           const Spacer(),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               const Padding(padding: EdgeInsets.only(top: 7.0)),
-                              Text(i["timeCompleted"], style: const TextStyle(fontSize: 10.0)),
+                              if (i['category'] == 0)
+                                Text(i["time_completed"].toString().replaceAll('ago', ''), style: const TextStyle(fontSize: 10.0)),
+                              if (i['category'] == 1)
+                                Text(i["time_until_match"].toString().replaceAll('from now', ''), style: const TextStyle(fontSize: 10.0, color: Colors.green)),
+                              if (i['category'] == 2)
+                                Text(i["time_until_match"].toString().replaceAll('from now', ''), style: const TextStyle(fontSize: 10.0, color: Colors.red)),
                             ],
                           ),
                           const Spacer(),
@@ -117,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }).toList(),
           ),
+          const Padding(padding: EdgeInsets.only(top: 10.0)),
           Expanded(child:
             ListView.builder(
               scrollDirection: Axis.vertical,
@@ -130,7 +179,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => ArticleScreen(articleId: articles[index].id.toString(),),
+                          builder: (context) => ArticleScreen(
+                            id: articles[index]['id'].toString(),
+                            title: articles[index]['title'],
+                            author: articles[index]['author'],
+                            date: articles[index]['date'],
+                          ),
                         ),
                       );
                     },
@@ -139,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ListTile(
                           leading: const Icon(Icons.newspaper, color: Color(0xFFd4d4d4),),
                           title: Text(
-                            articles[index].title,
+                            articles[index]['title'],
                             style: const TextStyle(
                                 decoration: TextDecoration.underline,
                                 decorationColor: Color(0xFFd4d4d4),
@@ -147,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            articles[index].description,
+                            articles[index]['description'],
                             style: const TextStyle(color: Color(0xFFd4d4d4)),
                           ),
                         )
@@ -164,11 +218,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> toListAsync() async {
-    fetchCompletedMatches().then((value) {
+    fetchLiveMatches().then((value) {
       setState(() {
         matches = value;
       });
+      fetchUpcommingMatches().then((value) {
+        setState(() {
+          matches += value;
+        });
+        fetchCompletedMatches().then((value) {
+          setState(() {
+            matches += value;
+          });
+        });
+      });
     });
+
     fetchNews().then((value) {
       setState(() {
         articles = value;
