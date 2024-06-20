@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
+var matchList = [];
+var matchFavList = [];
+var favTourny = ["Korea", "EMEA"];
+final dio = Dio();
+
 fetchNews() async {
-  final response =
-      await http.get(Uri.parse('https://vlrggapi.vercel.app/news'));
+  final response = await dio.get('https://vlrggapi.vercel.app/news');
   var articles = [];
   if (response.statusCode == 200) {
-    var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-    articles = jsonResponse['data']['segments'];
+    articles = response.data['data']['segments'];
     for (var article in articles) {
       var id = article['url_path'].split('/')[3];
       article['id'] = id;
@@ -19,21 +23,22 @@ fetchNews() async {
 }
 
 fetchCompletedMatches() async {
-  final response =
-      await http.get(Uri.parse('https://vlrggapi.vercel.app/match?q=results'));
-  var matches = [];
+  final response = await dio.get('https://vlrggapi.vercel.app/match?q=results');
   if (response.statusCode == 200) {
-    var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-    var matchesList = jsonResponse['data']['segments'];
-    for (int i = 0; i < matchesList.length; i++) {
-      if (!matchesList[i]['time_completed'].toString().contains('1d')) {
-        matchesList[i]['category'] = 0;
-        matches.add(matchesList[i]);
+    var matches = response.data['data']['segments'];
+    for (int i = 0; i < matches.length; i++) {
+      if (!matches[i]['time_completed'].toString().contains('1d')) {
+        matches[i]['category'] = 0;
+        if(matchIsFavorite(matches[i])){
+          matchFavList.add(matches[i]);
+          return matchFavList;
+        }
+        matchList.add(matches[i]);
       } else {
-        return matches;
+        return matchList;
       }
     }
-    return matches;
+    return matchList;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -41,17 +46,20 @@ fetchCompletedMatches() async {
   }
 }
 
-fetchUpcommingMatches() async {
-  final response =
-      await http.get(Uri.parse('https://vlrggapi.vercel.app/match?q=upcoming'));
+fetchUpcomingMatches() async {
+  final response = await dio.get('https://vlrggapi.vercel.app/match?q=upcoming');
   var matches = [];
   if (response.statusCode == 200) {
-    var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-    matches = jsonResponse['data']['segments'];
+    matches += response.data['data']['segments'];
     for (int i = 0; i < matches.length; i++) {
       matches[i]['category'] = 1;
+      if(matchIsFavorite(matches[i])){
+        matchFavList.add(matches[i]);
+        return matchFavList;
+      }
+      matchList.add(matches[i]);
     }
-    return matches;
+    return matchList;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -60,16 +68,19 @@ fetchUpcommingMatches() async {
 }
 
 fetchLiveMatches() async {
-  final response =
-      await http.get(Uri.parse('https://vlrggapi.vercel.app/match?q=live_score'));
+  final response = await dio.get('https://vlrggapi.vercel.app/match?q=live_score');
   var matches = [];
   if (response.statusCode == 200) {
-    var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-    matches = jsonResponse['data']['segments'];
+    matches += response.data['data']['segments'];
     for (int i = 0; i < matches.length; i++) {
       matches[i]['category'] = 2;
+      if(matchIsFavorite(matches[i])){
+        matchFavList.add(matches[i]);
+        return matchFavList;
+      }
+      matchList.add(matches[i]);
     }
-    return matches;
+    return matchList;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -78,12 +89,11 @@ fetchLiveMatches() async {
 }
 
 fetchArticles(var articleId) async {
-  final response =
-      await http.get(Uri.parse('http://0.0.0.0:3001/article/$articleId'));
+  final dio = Dio();
+  final response = await dio.get('http://0.0.0.0:3001/article/$articleId');
   var text = '';
   if (response.statusCode == 200) {
-    var jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-    text = jsonResponse['data']['segments'][0]['text'];
+    text = response.data['data']['segments'][0]['text'];
   }
   return text;
 }
@@ -138,5 +148,33 @@ countryToFlag(var country){
       return '🇩🇪';
     case 'flag_fr':
       return '🇫🇷';
+    case 'flag_my':
+      return '🇲🇾';
+    case 'flag_tw':
+      return '🇹🇼';
+    case 'flag_mn':
+      return '🇲🇳';
+    case 'flag_vn':
+      return '🇻🇳';
   }
+}
+
+matchIsFavorite(var match){
+  int score = 0;
+  String tournament = "";
+  if (match['tournament_name'] == null) {
+    tournament = match['match_event'];
+  }
+  else {
+    tournament = match['tournament_name'];
+  }
+  for (String favorite in favTourny){
+    if(tournament.contains(favorite)){
+      score++;
+    }
+  }
+  if (score > 0){
+    return true;
+  }
+  return false;
 }

@@ -1,5 +1,4 @@
 import 'package:vlr/service.dart';
-import 'tiroir_nav.dart';
 import 'package:flutter/material.dart';
 
 class ArticleScreen extends StatefulWidget {
@@ -28,7 +27,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const LeTiroir(),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2f3337),
       ),
