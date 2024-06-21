@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:vlr/home_screen.dart';
+import 'package:vlr/leagues.dart';
 import 'package:vlr/news.dart';
 import 'package:vlr/service.dart';
 
-class Default extends StatefulWidget {
-  const Default({super.key});
+class Valorant extends StatefulWidget {
+  const Valorant({super.key});
 
   @override
-  State<Default> createState() => _DefaultState();
+  State<Valorant> createState() => _ValorantState();
 }
 
-class _DefaultState extends State<Default> {
+class _ValorantState extends State<Valorant> {
 
   @override
   void initState() {
     super.initState();
+
+    fetchLiveMatches();
+    fetchUpcomingMatches();
+    fetchCompletedMatches();
   }
 
   int _selectedIndex = 0;
@@ -22,7 +27,7 @@ class _DefaultState extends State<Default> {
   final List<Widget> _screens = [
     HomeScreen(),
     News(),
-    News(),
+    Leagues(),
     News(),
     News()
   ];

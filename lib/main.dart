@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vlr/default.dart';
+import 'package:vlr/valorant.dart';
 import 'article_screen.dart';
 import 'home_screen.dart';
 
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Default(),
+      home: const Valorant(),
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF2f3337),
         visualDensity: VisualDensity.adaptivePlatformDensity,

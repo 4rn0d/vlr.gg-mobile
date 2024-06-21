@@ -16,9 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     matchList = [];
     matchFavList = [];
+    fetchUpcomingMatches();
     fetchCompletedMatches();
     fetchLiveMatches();
-    fetchUpcomingMatches();
   }
 
   @override
@@ -26,12 +26,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          SingleChildScrollView(
+          Expanded(
             child: ListView.builder(
             shrinkWrap: true,
-            itemCount: matchFavList.length,
+            itemCount: matchList.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
+                color: Color(0xFF535c65),
                 child: Container(
                   width: MediaQuery
                       .of(context)
@@ -51,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text(countryToFlag(matchFavList[index]['flag1']),
+                              Text(countryToFlag(matchList[index]['flag1']),
                                   style: const TextStyle(fontSize: 16.0)),
-                              Text(countryToFlag(matchFavList[index]['flag2']),
+                              Text(countryToFlag(matchList[index]['flag2']),
                                   style: const TextStyle(fontSize: 16.0)),
                             ],
                           ),
@@ -62,24 +63,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               SizedBox(
                                 width: 210.0,
-                                child: Text(matchFavList[index]["team1"],
+                                child: Text(matchList[index]["team1"],
                                   style: const TextStyle(fontSize: 14.0),),
                               ),
                               SizedBox(
                                 width: 210.0,
-                                child: Text(matchFavList[index]["team2"],
+                                child: Text(matchList[index]["team2"],
                                     style: const TextStyle(fontSize: 14.0)),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      if (matchFavList[index]['category'] == 0)
+                      if (matchList[index]['category'] == 0)
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                                matchFavList[index]["score1"],
+                                matchList[index]["score1"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -87,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )
                             ),
                             Text(
-                                matchFavList[index]["score2"],
+                                matchList[index]["score2"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -96,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                      if (matchFavList[index]['category'] == 1)
+                      if (matchList[index]['category'] == 1)
                         const Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -114,12 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                      if (matchFavList[index]['category'] == 2)
+                      if (matchList[index]['category'] == 2)
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                                matchFavList[index]["score1"],
+                                matchList[index]["score1"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -127,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )
                             ),
                             Text(
-                                matchFavList[index]["score2"],
+                                matchList[index]["score2"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -141,19 +142,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Padding(padding: EdgeInsets.only(top: 7.0)),
-                          if (matchFavList[index]['category'] == 0)
-                            Text(matchFavList[index]["time_completed"]
+                          if (matchList[index]['category'] == 0)
+                            Text(matchList[index]["time_completed"]
                                 .toString()
                                 .replaceAll('ago', ''),
                                 style: const TextStyle(fontSize: 10.0)),
-                          if (matchFavList[index]['category'] == 1)
-                            Text(matchFavList[index]["time_until_match"]
+                          if (matchList[index]['category'] == 1)
+                            Text(matchList[index]["time_until_match"]
                                 .toString()
                                 .replaceAll('from now', ''),
                                 style: const TextStyle(
                                     fontSize: 10.0, color: Colors.green)),
-                          if (matchFavList[index]['category'] == 2)
-                            Text(matchFavList[index]["time_until_match"]
+                          if (matchList[index]['category'] == 2)
+                            Text(matchList[index]["time_until_match"]
                                 .toString()
                                 .replaceAll('from now', ''),
                                 style: const TextStyle(

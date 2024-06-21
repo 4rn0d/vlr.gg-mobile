@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:vlr/Models/event.dart';
+import 'package:vlr/leagues.dart';
 
 var matchList = [];
 var matchFavList = [];
-var favTourny = ["Korea", "EMEA"];
+var favTourny = ["Challengers League Korea", "Champions Tour EMEA"];
 final dio = Dio();
 
 fetchNews() async {
@@ -29,7 +31,7 @@ fetchCompletedMatches() async {
     for (int i = 0; i < matches.length; i++) {
       if (!matches[i]['time_completed'].toString().contains('1d')) {
         matches[i]['category'] = 0;
-        if(matchIsFavorite(matches[i])){
+        if(isFavorite(matches[i]["tournament_name"])){
           matchFavList.add(matches[i]);
           return matchFavList;
         }
@@ -53,7 +55,7 @@ fetchUpcomingMatches() async {
     matches += response.data['data']['segments'];
     for (int i = 0; i < matches.length; i++) {
       matches[i]['category'] = 1;
-      if(matchIsFavorite(matches[i])){
+      if(isFavorite(matches[i]["match_event"])){
         matchFavList.add(matches[i]);
         return matchFavList;
       }
@@ -74,7 +76,7 @@ fetchLiveMatches() async {
     matches += response.data['data']['segments'];
     for (int i = 0; i < matches.length; i++) {
       matches[i]['category'] = 2;
-      if(matchIsFavorite(matches[i])){
+      if(isFavorite(matches[i]["match_event"])){
         matchFavList.add(matches[i]);
         return matchFavList;
       }
@@ -96,6 +98,40 @@ fetchArticles(var articleId) async {
     text = response.data['data']['segments'][0]['text'];
   }
   return text;
+}
+
+fetchEvents() async {
+  final dio = Dio();
+  List<Event> tempEvents = [];
+  for (int i = 1; i <= 4; i++){
+    final response = await dio.get('https://vlr.orlandomm.net/api/v1/events?page=$i');
+    if (response.statusCode == 200) {
+      for (var event in response.data['data']){
+        tempEvents.add(Event.fromJson(event));
+      }
+    }
+  }
+  List<Event> events = [];
+  if (tempEvents.isNotEmpty) {
+    for (var event in tempEvents){
+      String eventName = event.name;
+
+      if (eventName.contains('Champions Tour') || eventName.contains('Challengers League') || eventName.contains('Game Changers')){
+        if (event.status != "completed"){
+          eventToLeague(event);
+          events.add(event);
+        }
+      }
+    }
+  }
+  events.sort((a, b) => a.dates.compareTo(b.dates));
+  events.sort((a, b) {
+    if(b.isFavorite) {
+      return 1;
+    }
+    return -1;
+  });
+  return events;
 }
 
 countryToFlag(var country){
@@ -159,17 +195,10 @@ countryToFlag(var country){
   }
 }
 
-matchIsFavorite(var match){
+isFavorite(String eventName){
   int score = 0;
-  String tournament = "";
-  if (match['tournament_name'] == null) {
-    tournament = match['match_event'];
-  }
-  else {
-    tournament = match['tournament_name'];
-  }
   for (String favorite in favTourny){
-    if(tournament.contains(favorite)){
+    if(eventName.contains(favorite)){
       score++;
     }
   }
@@ -177,4 +206,28 @@ matchIsFavorite(var match){
     return true;
   }
   return false;
+}
+
+eventToLeague(Event event){
+  String eventName = event.name;
+
+  String leagueName = eventName.split(':')[0];
+  var split = leagueName.split(' ');
+  String league = "";
+  for (String year in split){
+    if (year.contains("20")){
+      if (eventName.contains(": EMEA") || eventName.contains(": Americas") || eventName.contains(": Pacific") || eventName.contains(": China")){
+        String region = eventName.split(':')[1].split(' ')[1];
+          league += "$leagueName : $region";
+          league = league.replaceAll("$year ", "");
+      }
+      else{
+        league = leagueName.replaceAll("$year ", "");
+      }
+    }
+    else if (!leagueName.contains("20")) {
+      league = leagueName;
+    }
+  }
+  return league;
 }
