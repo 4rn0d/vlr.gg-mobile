@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vlr/Models/event.dart';
-import 'package:vlr/service.dart';
+import 'package:vlr/app/valorant/Models/event.dart';
+import 'package:vlr/app/valorant/Services/valorant_service.dart' as api;
 
 class Leagues extends StatefulWidget {
   const Leagues({super.key});
@@ -14,7 +14,7 @@ class _LeaguesState extends State<Leagues> {
   List<Event> _leagues = [];
 
   Future<void> toListAsync() async {
-    fetchEvents().then((value) {
+    api.fetchEvents().then((value) {
       setState(() {
         _leagues = value;
       });
@@ -30,7 +30,7 @@ class _LeaguesState extends State<Leagues> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: !api.isLoading ? Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
           itemCount: _leagues.length,
@@ -66,7 +66,7 @@ class _LeaguesState extends State<Leagues> {
             );
           }
         ),
-      ),
+      ): const Center(child: CircularProgressIndicator(color: Color(0xffda626c),)),
     );
   }
 }

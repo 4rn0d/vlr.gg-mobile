@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vlr/article_screen.dart';
-import 'package:vlr/service.dart';
+import 'package:vlr/app/valorant/article_screen.dart';
+import 'package:vlr/app/valorant/Services/valorant_service.dart';
 
 class News extends StatefulWidget {
   const News({super.key});

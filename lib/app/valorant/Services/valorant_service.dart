@@ -1,15 +1,22 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:vlr/Models/event.dart';
-import 'package:vlr/leagues.dart';
+import 'package:palette_generator/palette_generator.dart';
+import 'package:vlr/app/valorant/Models/event.dart';
+import 'package:vlr/app/valorant/Models/team.dart';
+import 'package:vlr/app/valorant/leagues.dart';
 
 var matchList = [];
 var matchFavList = [];
 var favTourny = ["Challengers League Korea", "Champions Tour EMEA"];
+var favTeams = [];
 final dio = Dio();
+bool isLoading = false;
 
 fetchNews() async {
+  isLoading = true;
   final response = await dio.get('https://vlrggapi.vercel.app/news');
   var articles = [];
   if (response.statusCode == 200) {
@@ -18,6 +25,7 @@ fetchNews() async {
       var id = article['url_path'].split('/')[3];
       article['id'] = id;
     }
+    isLoading = false;
     return articles;
   } else {
     throw Exception('Failed to load article');
@@ -25,6 +33,7 @@ fetchNews() async {
 }
 
 fetchCompletedMatches() async {
+  isLoading = true;
   final response = await dio.get('https://vlrggapi.vercel.app/match?q=results');
   if (response.statusCode == 200) {
     var matches = response.data['data']['segments'];
@@ -33,13 +42,16 @@ fetchCompletedMatches() async {
         matches[i]['category'] = 0;
         if(isFavorite(matches[i]["tournament_name"])){
           matchFavList.add(matches[i]);
+          isLoading = false;
           return matchFavList;
         }
         matchList.add(matches[i]);
       } else {
+        isLoading = false;
         return matchList;
       }
     }
+    isLoading = false;
     return matchList;
   } else {
     // If the server did not return a 200 OK response,
@@ -49,6 +61,7 @@ fetchCompletedMatches() async {
 }
 
 fetchUpcomingMatches() async {
+  isLoading = true;
   final response = await dio.get('https://vlrggapi.vercel.app/match?q=upcoming');
   var matches = [];
   if (response.statusCode == 200) {
@@ -57,10 +70,12 @@ fetchUpcomingMatches() async {
       matches[i]['category'] = 1;
       if(isFavorite(matches[i]["match_event"])){
         matchFavList.add(matches[i]);
+        isLoading = false;
         return matchFavList;
       }
       matchList.add(matches[i]);
     }
+    isLoading = false;
     return matchList;
   } else {
     // If the server did not return a 200 OK response,
@@ -70,6 +85,7 @@ fetchUpcomingMatches() async {
 }
 
 fetchLiveMatches() async {
+  isLoading = true;
   final response = await dio.get('https://vlrggapi.vercel.app/match?q=live_score');
   var matches = [];
   if (response.statusCode == 200) {
@@ -78,10 +94,12 @@ fetchLiveMatches() async {
       matches[i]['category'] = 2;
       if(isFavorite(matches[i]["match_event"])){
         matchFavList.add(matches[i]);
+        isLoading = false;
         return matchFavList;
       }
       matchList.add(matches[i]);
     }
+    isLoading = false;
     return matchList;
   } else {
     // If the server did not return a 200 OK response,
@@ -91,16 +109,19 @@ fetchLiveMatches() async {
 }
 
 fetchArticles(var articleId) async {
+  isLoading = true;
   final dio = Dio();
   final response = await dio.get('http://0.0.0.0:3001/article/$articleId');
   var text = '';
   if (response.statusCode == 200) {
     text = response.data['data']['segments'][0]['text'];
   }
+  isLoading = false;
   return text;
 }
 
 fetchEvents() async {
+  isLoading = true;
   final dio = Dio();
   List<Event> tempEvents = [];
   for (int i = 1; i <= 4; i++){
@@ -131,7 +152,44 @@ fetchEvents() async {
     }
     return -1;
   });
+  isLoading = false;
   return events;
+}
+
+fetchTeams() async {
+  isLoading = true;
+  var regions = ['na', 'eu', 'br', 'ap', 'kr', 'ch', 'jp', 'lan', 'las', 'oce', 'gc'];
+  List<Team> teams = [];
+  for (var region in regions){
+    final response = await dio.get('https://vlr.orlandomm.net/api/v1/teams?limit=50&region=$region');
+    if (response.statusCode == 200) {
+      for (var team in response.data['data']){
+        teams.add(Team.fromJson(team));
+      }
+    } else {
+      throw Exception('Failed to load teams');
+    }
+  }
+  isLoading = false;
+  teams.sort((a, b) => a.name.compareTo(b.name));
+  teams.sort((a, b) {
+    if(b.isFavorite) {
+      return 1;
+    }
+    return -1;
+  });
+  return teams;
+}
+
+fetchTeam(String id) async {
+  isLoading = true;
+  final response = await dio.get('https://vlr.orlandomm.net/api/v1/teams/$id');
+  if (response.statusCode == 200) {
+    isLoading = false;
+    return Team.fromJson(response.data['data']);
+  } else {
+    throw Exception('Failed to load teams');
+  }
 }
 
 countryToFlag(var country){
@@ -192,6 +250,10 @@ countryToFlag(var country){
       return '🇲🇳';
     case 'flag_vn':
       return '🇻🇳';
+    case 'flag_pt':
+      return '🇵🇹';
+    case 'flag_it':
+      return '🇮🇹';
   }
 }
 
@@ -230,4 +292,23 @@ eventToLeague(Event event){
     }
   }
   return league;
+}
+
+teamIsFavorite(String id){
+  int score = 0;
+  for (String favorite in favTeams){
+    if(id == favorite){
+      score++;
+    }
+  }
+  if (score > 0){
+    return true;
+  }
+  return false;
+}
+
+Future<Color> getImagePalette (ImageProvider imageProvider) async {
+  final PaletteGenerator paletteGenerator = await PaletteGenerator
+      .fromImageProvider(imageProvider);
+  return paletteGenerator.dominantColor!.color;
 }

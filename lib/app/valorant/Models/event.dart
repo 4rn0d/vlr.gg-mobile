@@ -1,5 +1,4 @@
-
-import 'package:vlr/service.dart' as service;
+import 'package:vlr/app/valorant/Services/valorant_service.dart' as service;
 class Event {
   final String id;
   final String name;

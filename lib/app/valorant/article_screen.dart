@@ -1,4 +1,4 @@
-import 'package:vlr/service.dart';
+import 'package:vlr/app/valorant/Services/valorant_service.dart';
 import 'package:flutter/material.dart';
 
 class ArticleScreen extends StatefulWidget {

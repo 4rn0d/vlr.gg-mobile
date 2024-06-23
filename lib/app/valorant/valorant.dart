@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vlr/home_screen.dart';
-import 'package:vlr/leagues.dart';
-import 'package:vlr/news.dart';
-import 'package:vlr/service.dart';
+import 'package:vlr/app/valorant/favorite.dart';
+import 'package:vlr/app/valorant/home_screen.dart';
+import 'package:vlr/app/valorant/leagues.dart';
+import 'package:vlr/app/valorant/news.dart';
+import 'package:vlr/app/valorant/Services/valorant_service.dart' as api;
 
 class Valorant extends StatefulWidget {
   const Valorant({super.key});
@@ -17,19 +18,20 @@ class _ValorantState extends State<Valorant> {
   void initState() {
     super.initState();
 
-    fetchLiveMatches();
-    fetchUpcomingMatches();
-    fetchCompletedMatches();
+    api.fetchLiveMatches();
+    api.fetchUpcomingMatches();
+    api.fetchCompletedMatches();
+    api.fetchTeams();
   }
 
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
-    News(),
-    Leagues(),
-    News(),
-    News()
+    const HomeScreen(),
+    const News(),
+    const Leagues(),
+    const Favorite(),
+    const News()
   ];
 
   @override
@@ -77,7 +79,8 @@ class _ValorantState extends State<Valorant> {
       titleTextStyle: const TextStyle(color: Colors.white, fontSize: 30),
       title: const Text('Valorant'),
     ),
-    body: _screens[_selectedIndex]
+    body: !api.isLoading ? _screens[_selectedIndex]:
+      const Center(child: CircularProgressIndicator(color: Color(0xffda626c),)),
     );
   }
 }

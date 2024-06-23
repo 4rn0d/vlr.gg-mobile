@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:vlr/valorant.dart';
-import 'article_screen.dart';
-import 'home_screen.dart';
+import 'package:vlr/app/valorant/valorant.dart';
+import 'app/valorant/article_screen.dart';
+import 'app/valorant/home_screen.dart';
 
 
 void main() {

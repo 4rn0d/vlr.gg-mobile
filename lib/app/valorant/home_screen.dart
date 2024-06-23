@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:vlr/service.dart';
+import 'package:vlr/app/valorant/Services/valorant_service.dart' as api;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,22 +14,22 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    matchList = [];
-    matchFavList = [];
-    fetchUpcomingMatches();
-    fetchCompletedMatches();
-    fetchLiveMatches();
+    api.matchList = [];
+    api.matchFavList = [];
+    api.fetchUpcomingMatches();
+    api.fetchCompletedMatches();
+    api.fetchLiveMatches();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: !api.isLoading ? Column(
         children: <Widget>[
           Expanded(
             child: ListView.builder(
             shrinkWrap: true,
-            itemCount: matchList.length,
+            itemCount: api.matchList.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
                 color: Color(0xFF535c65),
@@ -52,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text(countryToFlag(matchList[index]['flag1']),
+                              Text(api.countryToFlag(api.matchList[index]['flag1']),
                                   style: const TextStyle(fontSize: 16.0)),
-                              Text(countryToFlag(matchList[index]['flag2']),
+                              Text(api.countryToFlag(api.matchList[index]['flag2']),
                                   style: const TextStyle(fontSize: 16.0)),
                             ],
                           ),
@@ -63,24 +63,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               SizedBox(
                                 width: 210.0,
-                                child: Text(matchList[index]["team1"],
+                                child: Text(api.matchList[index]["team1"],
                                   style: const TextStyle(fontSize: 14.0),),
                               ),
                               SizedBox(
                                 width: 210.0,
-                                child: Text(matchList[index]["team2"],
+                                child: Text(api.matchList[index]["team2"],
                                     style: const TextStyle(fontSize: 14.0)),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      if (matchList[index]['category'] == 0)
+                      if (api.matchList[index]['category'] == 0)
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                                matchList[index]["score1"],
+                                api.matchList[index]["score1"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )
                             ),
                             Text(
-                                matchList[index]["score2"],
+                                api.matchList[index]["score2"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                      if (matchList[index]['category'] == 1)
+                      if (api.matchList[index]['category'] == 1)
                         const Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -115,12 +115,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                      if (matchList[index]['category'] == 2)
+                      if (api.matchList[index]['category'] == 2)
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                                matchList[index]["score1"],
+                                api.matchList[index]["score1"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 )
                             ),
                             Text(
-                                matchList[index]["score2"],
+                                api.matchList[index]["score2"],
                                 style: const TextStyle(
                                     fontSize: 14.0,
                                     decoration: TextDecoration.underline,
@@ -142,19 +142,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Padding(padding: EdgeInsets.only(top: 7.0)),
-                          if (matchList[index]['category'] == 0)
-                            Text(matchList[index]["time_completed"]
+                          if (api.matchList[index]['category'] == 0)
+                            Text(api.matchList[index]["time_completed"]
                                 .toString()
                                 .replaceAll('ago', ''),
                                 style: const TextStyle(fontSize: 10.0)),
-                          if (matchList[index]['category'] == 1)
-                            Text(matchList[index]["time_until_match"]
+                          if (api.matchList[index]['category'] == 1)
+                            Text(api.matchList[index]["time_until_match"]
                                 .toString()
                                 .replaceAll('from now', ''),
                                 style: const TextStyle(
                                     fontSize: 10.0, color: Colors.green)),
-                          if (matchList[index]['category'] == 2)
-                            Text(matchList[index]["time_until_match"]
+                          if (api.matchList[index]['category'] == 2)
+                            Text(api.matchList[index]["time_until_match"]
                                 .toString()
                                 .replaceAll('from now', ''),
                                 style: const TextStyle(
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           )
         ],
-      ),
+      ): const Center(child: CircularProgressIndicator(color: Color(0xffda626c),))
     );
   }
 }
