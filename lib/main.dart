@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vlr/app/rocket_league/rocket_league.dart';
 import 'package:vlr/app/valorant/valorant.dart';
 import 'app/valorant/article_screen.dart';
 import 'app/valorant/home_screen.dart';
@@ -14,9 +15,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Valorant(),
+      home: const RocketLeague(),
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF2f3337),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Color(0xFFd4d4d4)),
